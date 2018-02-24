@@ -11,7 +11,6 @@ def tic_tac_toe():
         print(board[6], board[7], board[8])
         print()
         
-
     def choose_number():
         bStop = False
         token = 'X'
