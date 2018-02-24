@@ -10,6 +10,7 @@ def tic_tac_toe():
         print(board[3], board[4], board[5])
         print(board[6], board[7], board[8])
         print()
+        
 
     def choose_number():
         bStop = False
@@ -18,7 +19,7 @@ def tic_tac_toe():
         while not bStop:
             a = randint(0,8)
             try:
-                if board[a] == "X" or board[a] == "O":
+                if board[a] == "X" or board[a] == "O": 
                     bStop = False
                 else:
                     if token == 'X':
