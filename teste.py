@@ -125,7 +125,7 @@ def determine(board, player):
         board.make_move(move, player)
         val = board.alphabeta(board, get_enemy(player), -2, 2)
         board.make_move(move, '_')
-        print("jogada:", move + 1, "peso:", board.winners[val + 1])
+        print("move:", move + 1, "peso:", board.winners[val + 1])
         if val > a:
             a = val
             choices = [move]
