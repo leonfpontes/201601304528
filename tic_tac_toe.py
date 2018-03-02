@@ -1,6 +1,4 @@
-import sys
-import time
-import getopt
+#!/usr/bin/env python
 
 import random
 
@@ -13,39 +11,19 @@ class Tic(object):
 
     winners = ('-1', '0', '1')
 
-    squares = []
-
-    #def __init__(self, squares=[]):
-    #    if len(squares) == 0:
-    #        self.squares = ['_' for i in range(9)]
-    #    else:
-    #        self.squares = squares
+    def __init__(self, squares=[]):
+        if len(squares) == 0:
+            self.squares = [None for i in range(9)]
+        else:
+            self.squares = squares
 
     def show(self):
-        #for element in [self.squares[i:i + 3] for i in range(0, len(self.squares), 3)]:
-        #    print element
-        board = ''.join(self.squares)
-        if len(board) == 9:
-            print("           ")
-            for line in range(3):
-                line_str = ''
-                line_bar = ['','|','|']
-                for item in board[line*3:line*3+3]:
-                    if item.upper() == 'X':
-                        line_str += ' X ' + line_bar.pop()
-                    elif item.upper() == 'O':
-                        line_str += ' O ' + line_bar.pop()
-                    else:
-                        line_str += '   ' + line_bar.pop()
-                print(line_str)
-                if line == 2:
-                    print("           ")
-                else:
-                    print("-----------")
+        for element in [self.squares[i:i + 3] for i in range(0, len(self.squares), 3)]:
+            print element
 
     def available_moves(self):
         """what spots are left empty?"""
-        return [k for k, v in enumerate(self.squares) if v is '_']
+        return [k for k, v in enumerate(self.squares) if v is None]
 
     def available_combos(self, player):
         """what combos are available?"""
@@ -53,9 +31,9 @@ class Tic(object):
 
     def complete(self):
         """is the game over?"""
-        if '_' not in [v for v in self.squares]:
+        if None not in [v for v in self.squares]:
             return True
-        if self.winner() != '_':
+        if self.winner() != None:
             return True
         return False
 
@@ -66,7 +44,7 @@ class Tic(object):
         return self.winner() == 'O'
 
     def tied(self):
-        return self.complete() == True and self.winner() is '_'
+        return self.complete() == True and self.winner() is None
 
     def winner(self):
         for player in ('X', 'O'):
@@ -78,7 +56,7 @@ class Tic(object):
                         win = False
                 if win:
                     return player
-        return '_'
+        return None
 
     def get_squares(self, player):
         """squares that belong to a player"""
@@ -99,7 +77,7 @@ class Tic(object):
         for move in node.available_moves():
             node.make_move(move, player)
             val = self.alphabeta(node, get_enemy(player), alpha, beta)
-            node.make_move(move, '_')
+            node.make_move(move, None)
             if player == 'O':
                 if val > alpha:
                     alpha = val
@@ -124,8 +102,8 @@ def determine(board, player):
     for move in board.available_moves():
         board.make_move(move, player)
         val = board.alphabeta(board, get_enemy(player), -2, 2)
-        board.make_move(move, '_')
-        print("jogada:", move + 1, "peso:", board.winners[val + 1])
+        board.make_move(move, None)
+        print "move:", move + 1, "causes:", board.winners[val + 1]
         if val > a:
             a = val
             choices = [move]
@@ -140,29 +118,21 @@ def get_enemy(player):
     return 'X'
 
 if __name__ == "__main__":
-    argv = sys.argv[1:]
     board = Tic()
-    try:
-        opts, args = getopt.getopt(argv,"hf:b:v",["first=","board=","verbose="])
-        for opt, arg in opts:
-            if opt == '-h':
-                print("%s -f x -b ____x____"%(__file__))
-                sys.exit()
-            elif opt in ("-v", "--verbose"):
-                board.show()
-            elif opt in ("-b", "--board"):
-                if len(arg) == 9:
-                    board.squares = list(arg)
-                else:
-                    print("wrong board!")
-            elif opt in ("-f", "--first"):
-                player = args
-        player_move = board.squares.index('x')
-        if not player_move in board.available_moves():
-            board.complete()
-        board.make_move(player_move, player)
-        computer_move = determine(board, player)
+    board.show()
 
-    except getopt.GetoptError:
-        print("%s -f x -b ____x____"%(__file__))
-        sys.exit(2)
+    while not board.complete():
+        player = 'X'
+        player_move = int(raw_input("Next Move: ")) - 1
+        if not player_move in board.available_moves():
+            continue
+        board.make_move(player_move, player)
+        board.show()
+
+        if board.complete():
+            break
+        player = get_enemy(player)
+        computer_move = determine(board, player)
+        board.make_move(computer_move, player)
+        board.show()
+    print "winner is", board.winner()
